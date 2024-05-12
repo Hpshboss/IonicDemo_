@@ -5,121 +5,134 @@
         <ion-title>My Cards</ion-title>
       </ion-toolbar>
     </ion-header>
+    
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">My Cards</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <ion-row class="ion-align-items-center" style="height: 100%;">
-          <ion-col size="4">
-            <ion-list>
-              <ion-col size="3" class="custom-slider">
-                <!-- Custom slider for items -->
-                <div class="custom-slider" @click="handleScroll">
-                  <div
-                    v-for="item in items" 
-                    :key="item.id" 
-                    :data-id="item.id" 
-                    :class="{'font-bold': selectedItem.value === item.id}" 
-                    @click="selectItem(item.id)" 
-                    :ref="itemRefs">
-                    <ion-item button>{{ item.text }}</ion-item>
-                  </div>
-                </div>
-              </ion-col>
-            </ion-list>
-          </ion-col>
-          <ion-col size="8">
-            <!-- Dynamic Component -->
-            <!-- <component :is="currentComponent"></component> -->
-          </ion-col>
-        </ion-row>
-      </ion-content>
+      <ion-row class="ion-align-items-center" style="height: 100%;">
+        <!-- Left navigation bar -->
+        <ion-col size="4">
+          <ion-list>
+            <ion-item
+              v-for="item in items"
+              :key="item.id"
+              :class="{'font-bold': selectedItem === item.id}"
+              @click="selectItem(item)"
+              button>
+              {{ item.text }}
+            </ion-item>
+          </ion-list>
+        </ion-col>
+
+        <!-- Right static content area -->
+        <ion-col size="8">
+          <ion-card @touchstart="handleTouchStart" @touchmove="handleTouchMove" @touchend="handleTouchEnd">
+            <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/card-media.png" />
+            <ion-card-header>
+              <ion-card-title v-text="cardTitle"></ion-card-title>
+              <ion-card-subtitle>Card Subtitle</ion-card-subtitle>
+            </ion-card-header>
+
+            <ion-card-content v-text="text_test"></ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonCol, IonList, IonRow, IonItem, IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonBIonLabel, IonSegment, IonSegmentButtontton } from '@ionic/vue';
-import ExploreContainer from '@/components/ExploreContainer.vue';
-import { ref, onMounted } from 'vue';
+import { IonCol, IonList, IonRow, IonItem, IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
+import { ref } from 'vue';
 
-const selectedItem = ref({ id: "" }); // 使用ref来声明响应式数据
+const selectedItem = ref('general'); // 使用 ref 来声明响应式数据，初值为 'general'
+const cardTitle = ref('General Cards');
 
 // 选择项目时更新 selectedItem
-const selectItem = (id) => {
-  selectedItem.value = id;
+const selectItem = (item) => {
+  selectedItem.value = item.id;
+  cardTitle.value = item.cardTitle;
 };
 
-const handleScroll = (event) => {
-    // 获取容器和项目的 DOM 元素
-    console.log(event);
-    const container = event.target;
-    const items = container.children;
-
-    // 容器中点的位置
-    const centerPosition = container.scrollTop + container.offsetHeight / 2;
-
-    // 用于存储最接近中心的项目和其偏移量
-    let closestItem = ref<HTMLElement | null>(null);
-    let closestDistance = Infinity;
-
-    console.log(items);
-    // 遍历项目，找到中心点最接近的项目
-    Array.from<HTMLElement>(items).forEach((item: HTMLElement) => {
-      // 项目中心点的位置
-      const itemCenter = item.offsetTop + item.offsetHeight / 2;
-      // 计算中心点的距离
-      const distance = Math.abs(centerPosition - itemCenter);
-      console.log(distance);
-      // 检查是否是最接近的
-      if (distance < closestDistance) {
-        console.log(444);
-        closestDistance = distance;
-        closestItem = item; // 正确地改变 ref 的值
-      }
-      console.log(item);
-    });
-
-    // 如果找到了最接近的项目，则更新选中状态
-    if (closestItem) {
-      console.log(555);
-      // selectedItem.value = closestItem;
-    }
-}
-
-// 示例数据，确保每个元素都有一个唯一的 id
+// Items for the navigation bar
 const items = ref([
-  { id: 'general', text: 'General' },
-  { id: 'seminar', text: 'Seminar' },
-  { id: 'limitTime', text: 'Limit Time' },
-  { id: 'private', text: 'Private' },
-  { id: 'unsorted', text: 'Unsorted' }
+  { id: 'general', text: 'General', cardTitle: 'Geneal Cards' },
+  { id: 'seminar', text: 'Seminar', cardTitle: 'Seminar Cards' },
+  { id: 'limitTime', text: 'Limit Time', cardTitle: 'Limit Time Cards' },
+  { id: 'private', text: 'Private', cardTitle: 'Private Cards' },
+  { id: 'unsorted', text: 'Unsorted', cardTitle: 'Unsorted Cards' }
 ]);
 
-const itemRefs = ref([])
+const text_test_arr = ref(["You've swipe right", "You've swipe left"]);
+const text_test = ref("You've swipe right");
 
-onMounted(() => {
-  alert(itemRefs.value.map(i => i.textContent))
-})
+const startX = ref(0);
+const startY = ref(0);
+const endX = ref(0);
+const endY = ref(0);
+
+function handleTouchStart(event: TouchEvent) {
+  console.log("Start");
+  if (event.changedTouches.length === 1) {
+    startX.value = event.changedTouches[0].clientX;
+    startY.value = event.changedTouches[0].clientY;
+  }
+}
+
+function handleTouchMove(event: TouchEvent) {
+  if (event.changedTouches.length === 1) {
+    endX.value = event.changedTouches[0].clientX;
+    endY.value = event.changedTouches[0].clientY;
+  }
+}
+
+function handleTouchEnd() {
+  console.log("End");
+  const deltaX = endX.value - startX.value;
+  const deltaY = endY.value - startY.value;
+  if (Math.abs(deltaX) > Math.abs(deltaY)) { // 确认是水平方向滑动
+    if (deltaX > 0) {
+      console.log("deltaX:" + deltaX);
+      console.log("deltaY:" + deltaY);
+      swipeRight();
+    } else {
+      console.log("deltaX:" + deltaX);
+      console.log("deltaY:" + deltaY);
+      swipeLeft();
+    }
+  }
+}
+
+function swipeRight() {
+  console.log('Swiped right');
+  text_test.value = text_test_arr.value[0];
+}
+
+function swipeLeft() {
+  console.log('Swiped left');
+  text_test.value = text_test_arr.value[1];
+}
+
+
 </script>
 
 <style>
-.custom-slider .slider-container {
+/* Ensuring the navigation bar and content area are aligned properly */
+ion-col {
   display: flex;
   flex-direction: column;
-  overflow-y: scroll; /* Allow vertical scrolling */
-  height: 200px; /* Set a fixed height */
+  padding: 10px;
 }
 
-.custom-slider ion-item {
-  flex: none; /* Prevent items from growing or shrinking */
-  margin-bottom: 50px; /* Adjust the margin as needed */
+/* Styling for the navigation bar items */
+ion-item {
+  cursor: pointer;
+  margin-bottom: 10px;
 }
 
+/* Bold style for the selected item */
 .font-bold {
   font-weight: bold;
+  color: blue; /* Optional: makes it easier to see which item is selected */
 }
 </style>
+
+

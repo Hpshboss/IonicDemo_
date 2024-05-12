@@ -19,8 +19,11 @@
     "@capacitor/status-bar": "5.0.7",
     "@ionic/vue": "^7.8.4",
     "@ionic/vue-router": "^7.8.4",
+    "@vue/runtime-core": "^3.4.27",
+    "@vue/runtime-dom": "^3.4.27",
     "ionicons": "^7.0.0",
-    "vue": "^3.3.0",
+    "vue": "^3.4.27",
+    "vue-class-component": "^7.2.6",
     "vue-router": "^4.2.0"
   },
   "devDependencies": {
