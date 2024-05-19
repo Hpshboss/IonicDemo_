@@ -8,9 +8,9 @@
           <ion-label>My Cards</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="tab1" href="/tabs/tab1">
+        <ion-tab-button tab="QRCode" href="/tabs/QRCode">
           <ion-icon aria-hidden="true" :icon="triangle" />
-          <ion-label>Tab 1</ion-label>
+          <ion-label>QR Code</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="tab2" href="/tabs/tab2">
